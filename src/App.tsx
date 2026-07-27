@@ -125,7 +125,6 @@ export default function App() {
                   <>
                     {' '}
                     · {readyCount} ready to play
-                    {readyCount === 0 && ' (upload to Dropbox to enable)'}
                   </>
                 )}
               </p>
@@ -232,8 +231,7 @@ export default function App() {
             >
               SoundCloud
             </a>
-            . When a master is shared from Dropbox, the cover becomes playable
-            for anyone — no account needed.
+            . Tap a cover to play — no account needed.
           </p>
         </section>
       </main>

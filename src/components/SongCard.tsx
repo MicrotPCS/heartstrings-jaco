@@ -44,7 +44,7 @@ export function SongCard({
         disabled={!playable}
         aria-label={
           !playable
-            ? `${song.title} — audio not on Dropbox yet`
+            ? `${song.title} — not available yet`
             : isPlaying && isActive
               ? `Pause ${song.title}`
               : `Play ${song.title}`
@@ -88,7 +88,7 @@ export function SongCard({
           On SoundCloud · {formatUploadDate(song.soundcloudUploadDate)}
         </p>
         {!playable && (
-          <p className="song-pending-note">Awaiting Dropbox upload</p>
+          <p className="song-pending-note">Coming soon</p>
         )}
         {song.description && (
           <p className="song-desc">{song.description}</p>

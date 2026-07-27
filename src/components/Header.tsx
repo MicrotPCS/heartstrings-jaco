@@ -43,7 +43,7 @@ export function Header() {
         </h2>
         <p className="hero-lede">
           Original country songs by Jaco van Zyl — ordered by when they landed
-          on SoundCloud. Tap a cover to stream once the master is in Dropbox.
+          on SoundCloud. Tap a cover to listen.
         </p>
       </div>
     </header>
