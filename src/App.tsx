@@ -3,8 +3,7 @@ import { Header } from './components/Header'
 import { PlayerBar } from './components/PlayerBar'
 import { SongCard } from './components/SongCard'
 import catalog from './data/songs.json'
-import { useLikes } from './hooks/useLikes'
-import { useShareCounts } from './hooks/useShareCounts'
+import { useSongStats } from './hooks/useSongStats'
 import type { Song, SortOrder } from './types'
 import { hasDropboxAudio } from './types'
 import './App.css'
@@ -38,8 +37,14 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeId, setActiveId] = useState<string | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
-  const { isLiked, toggleLike } = useLikes()
-  const { getShareCount, recordShare } = useShareCounts()
+  const {
+    isLiked,
+    getLikeCount,
+    getShareCount,
+    toggleLike,
+    recordShare,
+    isGlobal,
+  } = useSongStats()
 
   const ordered = useMemo(() => {
     const sorted = sortSongs(songs, sortOrder)
@@ -127,6 +132,12 @@ export default function App() {
                     · {readyCount} ready to play
                   </>
                 )}
+                {!isGlobal && (
+                  <>
+                    {' '}
+                    · likes/shares are local until cloud stats are configured
+                  </>
+                )}
               </p>
             </div>
             <div className="section-tools">
@@ -193,10 +204,15 @@ export default function App() {
                   isActive={song.id === activeId}
                   isPlaying={isPlaying && song.id === activeId}
                   isLiked={isLiked(song.id)}
+                  likeCount={getLikeCount(song.id)}
                   shareCount={getShareCount(song.id)}
                   onSelect={handleSelect}
-                  onToggleLike={toggleLike}
-                  onShared={recordShare}
+                  onToggleLike={(id) => {
+                    void toggleLike(id)
+                  }}
+                  onShared={(id) => {
+                    void recordShare(id)
+                  }}
                 />
               ))}
             </div>

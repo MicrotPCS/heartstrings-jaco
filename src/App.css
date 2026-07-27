@@ -598,6 +598,7 @@ main,
   border-color: rgba(212, 165, 116, 0.5);
 }
 
+.like-count,
 .share-count {
   min-width: 1.15rem;
   padding: 0.05rem 0.35rem;
@@ -607,6 +608,11 @@ main,
   font-size: 0.72rem;
   font-variant-numeric: tabular-nums;
   text-align: center;
+}
+
+.like-btn.is-liked .like-count {
+  background: rgba(232, 160, 168, 0.22);
+  color: #f0c0c5;
 }
 
 .share-panel {
