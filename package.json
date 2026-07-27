@@ -8,11 +8,13 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "sync:soundcloud": "node scripts/sync-soundcloud.mjs"
+    "sync:soundcloud": "node scripts/sync-soundcloud.mjs",
+    "start": "serve -s dist -l ${PORT:-3000}"
   },
   "dependencies": {
     "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react-dom": "^19.2.7",
+    "serve": "^14.2.6"
   },
   "devDependencies": {
     "@types/node": "^24.13.2",
