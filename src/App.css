@@ -526,6 +526,14 @@ main,
   color: var(--ink-muted);
 }
 
+.song-copyright {
+  margin: 0.5rem 0 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  color: var(--ink-faint);
+  line-height: 1.4;
+}
+
 .song-actions {
   margin-top: auto;
   padding-top: 0.85rem;
@@ -533,9 +541,18 @@ main,
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
-.like-btn {
+.song-action-group {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.like-btn,
+.share-btn {
   appearance: none;
   display: inline-flex;
   align-items: center;
@@ -551,7 +568,8 @@ main,
   transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.12s;
 }
 
-.like-btn:hover {
+.like-btn:hover,
+.share-btn:hover {
   color: var(--gold-bright);
   border-color: rgba(212, 165, 116, 0.45);
 }
@@ -566,8 +584,77 @@ main,
   color: #f0c0c5;
 }
 
-.like-btn:active {
+.like-btn:active,
+.share-btn:active {
   transform: scale(0.96);
+}
+
+.share-menu {
+  position: relative;
+}
+
+.share-menu.is-open .share-btn {
+  color: var(--gold-bright);
+  border-color: rgba(212, 165, 116, 0.5);
+}
+
+.share-count {
+  min-width: 1.15rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 999px;
+  background: rgba(212, 165, 116, 0.18);
+  color: var(--gold-bright);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.share-panel {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 0.45rem);
+  z-index: 20;
+  min-width: 11.5rem;
+  padding: 0.55rem;
+  border-radius: 14px;
+  border: 1px solid rgba(212, 165, 116, 0.35);
+  background: rgba(28, 22, 18, 0.97);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(12px);
+}
+
+.share-panel-title {
+  margin: 0 0 0.35rem;
+  padding: 0.15rem 0.45rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.share-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.share-list button {
+  appearance: none;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--ink-muted);
+  font: inherit;
+  font-size: 0.88rem;
+  text-align: left;
+  padding: 0.5rem 0.55rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.share-list button:hover {
+  background: rgba(212, 165, 116, 0.12);
+  color: var(--ink);
 }
 
 .song-sc-link {

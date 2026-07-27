@@ -1,9 +1,10 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Header } from './components/Header'
 import { PlayerBar } from './components/PlayerBar'
 import { SongCard } from './components/SongCard'
 import catalog from './data/songs.json'
 import { useLikes } from './hooks/useLikes'
+import { useShareCounts } from './hooks/useShareCounts'
 import type { Song, SortOrder } from './types'
 import { hasDropboxAudio } from './types'
 import './App.css'
@@ -38,6 +39,7 @@ export default function App() {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const { isLiked, toggleLike } = useLikes()
+  const { getShareCount, recordShare } = useShareCounts()
 
   const ordered = useMemo(() => {
     const sorted = sortSongs(songs, sortOrder)
@@ -56,6 +58,23 @@ export default function App() {
     [],
   )
   const hasQuery = searchQuery.trim().length > 0
+
+  // Deep-link from shared URLs: ?song=catch-my-breath
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const songId = params.get('song')
+    if (!songId) return
+    const match = songs.find((s) => s.id === songId)
+    if (!match) return
+    setActiveId(match.id)
+    // Scroll after paint so the card exists
+    requestAnimationFrame(() => {
+      document.getElementById(`song-${match.id}`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      })
+    })
+  }, [])
 
   function handleSelect(song: Song) {
     if (!hasDropboxAudio(song)) return
@@ -175,8 +194,10 @@ export default function App() {
                   isActive={song.id === activeId}
                   isPlaying={isPlaying && song.id === activeId}
                   isLiked={isLiked(song.id)}
+                  shareCount={getShareCount(song.id)}
                   onSelect={handleSelect}
                   onToggleLike={toggleLike}
+                  onShared={recordShare}
                 />
               ))}
             </div>

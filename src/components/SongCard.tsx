@@ -1,14 +1,20 @@
 import type { Song } from '../types'
 import { hasDropboxAudio } from '../types'
 import { formatDuration, formatUploadDate, toDropboxDirectUrl } from '../utils/dropbox'
+import { ShareMenu } from './ShareMenu'
+
+/** Songs that already carry their own songwriter copyright notice. */
+const SKIP_DEFAULT_COPYRIGHT = new Set(['back-to-the-bright-days-adri'])
 
 interface SongCardProps {
   song: Song
   isActive: boolean
   isPlaying: boolean
   isLiked: boolean
+  shareCount: number
   onSelect: (song: Song) => void
   onToggleLike: (songId: string) => void
+  onShared: (songId: string) => void
 }
 
 export function SongCard({
@@ -16,16 +22,20 @@ export function SongCard({
   isActive,
   isPlaying,
   isLiked,
+  shareCount,
   onSelect,
   onToggleLike,
+  onShared,
 }: SongCardProps) {
   const cover = toDropboxDirectUrl(song.coverUrl)
   const duration = formatDuration(song.durationSeconds)
   const playable = hasDropboxAudio(song)
+  const showDefaultCopyright = !SKIP_DEFAULT_COPYRIGHT.has(song.id)
 
   return (
     <article
       className={`song-card${isActive ? ' is-active' : ''}${isPlaying ? ' is-playing' : ''}${playable ? '' : ' is-pending'}${isLiked ? ' is-liked' : ''}`}
+      id={`song-${song.id}`}
     >
       <button
         type="button"
@@ -83,31 +93,44 @@ export function SongCard({
         {song.description && (
           <p className="song-desc">{song.description}</p>
         )}
+        {showDefaultCopyright && (
+          <p className="song-copyright">
+            © 2026 Jaco van Zyl — All Rights Reserved
+          </p>
+        )}
 
         <div className="song-actions">
-          <button
-            type="button"
-            className={`like-btn${isLiked ? ' is-liked' : ''}`}
-            onClick={() => onToggleLike(song.id)}
-            aria-pressed={isLiked}
-            aria-label={
-              isLiked ? `Unlike ${song.title}` : `Like ${song.title}`
-            }
-          >
-            <svg
-              viewBox="0 0 24 24"
-              width="18"
-              height="18"
-              aria-hidden
-              fill={isLiked ? 'currentColor' : 'none'}
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinejoin="round"
+          <div className="song-action-group">
+            <button
+              type="button"
+              className={`like-btn${isLiked ? ' is-liked' : ''}`}
+              onClick={() => onToggleLike(song.id)}
+              aria-pressed={isLiked}
+              aria-label={
+                isLiked ? `Unlike ${song.title}` : `Like ${song.title}`
+              }
             >
-              <path d="M12 21s-6.5-4.35-9.33-8.18C.74 10.4 1.1 6.9 3.7 5.2c2.1-1.4 4.7-.9 6.1 1l2.2 2.6 2.2-2.6c1.4-1.9 4-2.4 6.1-1 2.6 1.7 3 5.2 1 7.62C18.5 16.65 12 21 12 21z" />
-            </svg>
-            <span>{isLiked ? 'Liked' : 'Like'}</span>
-          </button>
+              <svg
+                viewBox="0 0 24 24"
+                width="18"
+                height="18"
+                aria-hidden
+                fill={isLiked ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinejoin="round"
+              >
+                <path d="M12 21s-6.5-4.35-9.33-8.18C.74 10.4 1.1 6.9 3.7 5.2c2.1-1.4 4.7-.9 6.1 1l2.2 2.6 2.2-2.6c1.4-1.9 4-2.4 6.1-1 2.6 1.7 3 5.2 1 7.62C18.5 16.65 12 21 12 21z" />
+              </svg>
+              <span>{isLiked ? 'Liked' : 'Like'}</span>
+            </button>
+
+            <ShareMenu
+              song={song}
+              shareCount={shareCount}
+              onShared={onShared}
+            />
+          </div>
           {song.soundcloudUrl && (
             <a
               className="song-sc-link"
