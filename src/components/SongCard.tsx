@@ -6,17 +6,26 @@ interface SongCardProps {
   song: Song
   isActive: boolean
   isPlaying: boolean
+  isLiked: boolean
   onSelect: (song: Song) => void
+  onToggleLike: (songId: string) => void
 }
 
-export function SongCard({ song, isActive, isPlaying, onSelect }: SongCardProps) {
+export function SongCard({
+  song,
+  isActive,
+  isPlaying,
+  isLiked,
+  onSelect,
+  onToggleLike,
+}: SongCardProps) {
   const cover = toDropboxDirectUrl(song.coverUrl)
   const duration = formatDuration(song.durationSeconds)
   const playable = hasDropboxAudio(song)
 
   return (
     <article
-      className={`song-card${isActive ? ' is-active' : ''}${isPlaying ? ' is-playing' : ''}${playable ? '' : ' is-pending'}`}
+      className={`song-card${isActive ? ' is-active' : ''}${isPlaying ? ' is-playing' : ''}${playable ? '' : ' is-pending'}${isLiked ? ' is-liked' : ''}`}
     >
       <button
         type="button"
@@ -74,16 +83,42 @@ export function SongCard({ song, isActive, isPlaying, onSelect }: SongCardProps)
         {song.description && (
           <p className="song-desc">{song.description}</p>
         )}
-        {song.soundcloudUrl && (
-          <a
-            className="song-sc-link"
-            href={song.soundcloudUrl}
-            target="_blank"
-            rel="noreferrer"
+
+        <div className="song-actions">
+          <button
+            type="button"
+            className={`like-btn${isLiked ? ' is-liked' : ''}`}
+            onClick={() => onToggleLike(song.id)}
+            aria-pressed={isLiked}
+            aria-label={
+              isLiked ? `Unlike ${song.title}` : `Like ${song.title}`
+            }
           >
-            Open on SoundCloud
-          </a>
-        )}
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              aria-hidden
+              fill={isLiked ? 'currentColor' : 'none'}
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinejoin="round"
+            >
+              <path d="M12 21s-6.5-4.35-9.33-8.18C.74 10.4 1.1 6.9 3.7 5.2c2.1-1.4 4.7-.9 6.1 1l2.2 2.6 2.2-2.6c1.4-1.9 4-2.4 6.1-1 2.6 1.7 3 5.2 1 7.62C18.5 16.65 12 21 12 21z" />
+            </svg>
+            <span>{isLiked ? 'Liked' : 'Like'}</span>
+          </button>
+          {song.soundcloudUrl && (
+            <a
+              className="song-sc-link"
+              href={song.soundcloudUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              SoundCloud
+            </a>
+          )}
+        </div>
       </div>
     </article>
   )

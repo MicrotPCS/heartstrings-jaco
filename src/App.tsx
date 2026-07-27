@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Header } from './components/Header'
 import { PlayerBar } from './components/PlayerBar'
 import { SongCard } from './components/SongCard'
 import catalog from './data/songs.json'
+import { useLikes } from './hooks/useLikes'
 import type { Song, SortOrder } from './types'
 import { hasDropboxAudio } from './types'
 import './App.css'
@@ -36,11 +37,18 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeId, setActiveId] = useState<string | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
+  const { isLiked, toggleLike } = useLikes()
 
   const ordered = useMemo(() => {
     const sorted = sortSongs(songs, sortOrder)
     return sorted.filter((song) => matchesQuery(song, searchQuery))
   }, [sortOrder, searchQuery])
+
+  /** Playable queue in the order currently shown (sort + search). */
+  const playQueue = useMemo(
+    () => ordered.filter(hasDropboxAudio),
+    [ordered],
+  )
 
   const activeSong = songs.find((s) => s.id === activeId) ?? null
   const readyCount = useMemo(
@@ -59,6 +67,22 @@ export default function App() {
     setIsPlaying(true)
   }
 
+  const handleEnded = useCallback(() => {
+    if (!activeId) {
+      setIsPlaying(false)
+      return
+    }
+    const idx = playQueue.findIndex((s) => s.id === activeId)
+    if (idx === -1 || idx >= playQueue.length - 1) {
+      // End of the current list
+      setIsPlaying(false)
+      return
+    }
+    const next = playQueue[idx + 1]
+    setActiveId(next.id)
+    setIsPlaying(true)
+  }, [activeId, playQueue])
+
   function scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -74,7 +98,7 @@ export default function App() {
             <div>
               <h2 className="section-title">The collection</h2>
               <p className="section-lede">
-                Sorted by SoundCloud upload date ·{' '}
+                Sorted by SoundCloud upload date · continuous play ·{' '}
                 {hasQuery
                   ? `${ordered.length} match${ordered.length === 1 ? '' : 'es'}`
                   : `${songs.length} track${songs.length === 1 ? '' : 's'}`}
@@ -150,7 +174,9 @@ export default function App() {
                   song={song}
                   isActive={song.id === activeId}
                   isPlaying={isPlaying && song.id === activeId}
+                  isLiked={isLiked(song.id)}
                   onSelect={handleSelect}
+                  onToggleLike={toggleLike}
                 />
               ))}
             </div>
@@ -220,7 +246,7 @@ export default function App() {
         song={activeSong}
         isPlaying={isPlaying}
         onPlayingChange={setIsPlaying}
-        onEnded={() => setIsPlaying(false)}
+        onEnded={handleEnded}
       />
     </div>
   )

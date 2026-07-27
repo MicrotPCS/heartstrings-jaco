@@ -22,14 +22,14 @@ export function PlayerBar({
     if (!audio || !song) return
 
     const src = toDropboxDirectUrl(song.dropboxAudioUrl)
-    if (audio.src !== src) {
+    if (audio.dataset.songId !== song.id) {
+      audio.dataset.songId = song.id
       audio.src = src
       audio.load()
     }
 
     if (isPlaying) {
       void audio.play().catch(() => {
-        // Autoplay blocked or bad URL — keep UI honest
         onPlayingChange(false)
       })
     } else {
@@ -48,7 +48,11 @@ export function PlayerBar({
         preload="metadata"
         onEnded={onEnded}
         onPlay={() => onPlayingChange(true)}
-        onPause={() => onPlayingChange(false)}
+        onPause={() => {
+          // Track end also pauses — ignore so continuous play can advance.
+          if (audioRef.current?.ended) return
+          onPlayingChange(false)
+        }}
       />
       <img className="player-cover" src={cover} alt="" />
       <div className="player-info">
