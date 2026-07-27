@@ -25,6 +25,13 @@ export function Header() {
           >
             SoundCloud
           </a>
+          <a
+            href="https://open.spotify.com/artist/7LiBZXVXPxoRTuM6izeY2Z?si=9AFTWdu6RjagrYrkFAGLbg"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Spotify
+          </a>
         </nav>
       </div>
       <div className="hero">
