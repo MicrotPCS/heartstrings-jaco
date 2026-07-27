@@ -21,15 +21,20 @@ https://github.com/MicrotPCS/heartstrings-jaco
 4. Select **heartstrings-jaco**
 5. Apply the blueprint — it creates **heartstrings-country** from `render.yaml`
 
-### Option B — Manual static site
+### Option B — Manual static site (**preferred**)
 
-1. **New** → **Static Site**
+1. **New** → **Static Site** (not “Web Service”)
 2. Connect repo `MicrotPCS/heartstrings-jaco`, branch `main`
 3. Settings:
    - **Name:** `heartstrings-country`
    - **Build command:** `npm ci && npm run build`
    - **Publish directory:** `dist`
 4. **Create Static Site**
+
+> **Important:** Do **not** create a **Web Service** with Docker/Node unless you want a always-on server.  
+> If you already did and saw `error Command "start" not found`, either:
+> - Switch to a new **Static Site** (best), or  
+> - Keep the web service — the repo now includes `npm start` which runs `serve -s dist` (auto-deploys on push).
 
 You’ll get a temporary URL like:
 
