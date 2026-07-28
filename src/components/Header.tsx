@@ -32,6 +32,20 @@ export function Header() {
           >
             Spotify
           </a>
+          <a
+            href="https://music.apple.com/us/artist/heartstrings-jaco/1850071609"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Apple Music
+          </a>
+          <a
+            href="https://www.amazon.com/music/player/artists/B0FYWS9M2Y/heartstrings-jaco"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Amazon Music
+          </a>
         </nav>
       </div>
       <div className="hero">
