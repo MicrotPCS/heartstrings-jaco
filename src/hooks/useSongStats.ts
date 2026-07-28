@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
-import { getSupabase, hasCloudStats, type SongStatRow } from '../lib/supabase'
+import {
+  asSongStatRow,
+  getSupabase,
+  hasCloudStats,
+  initCloudStats,
+  type SongStatRow,
+} from '../lib/supabase'
 
 const LIKED_KEY = 'heartstrings-liked-ids'
 const LOCAL_STATS_KEY = 'heartstrings-local-stats'
@@ -67,82 +73,91 @@ function rowsToMaps(rows: SongStatRow[]): {
 }
 
 /**
- * Global likes & shares when Supabase env vars are set.
- * Without them, falls back to this browser only.
- * "I liked this" (heart filled) is always per-browser.
+ * Global likes & shares when Supabase is configured
+ * (env vars or /stats-config.json). Otherwise local-only.
  */
 export function useSongStats() {
   const [likeCounts, setLikeCounts] = useState<CountMap>({})
   const [shareCounts, setShareCounts] = useState<CountMap>({})
   const [likedIds, setLikedIds] = useState<Set<string>>(() => new Set())
   const [ready, setReady] = useState(false)
+  const [isGlobal, setIsGlobal] = useState(false)
 
   useEffect(() => {
     setLikedIds(readLikedIds())
-
-    const supabase = getSupabase()
-    if (!supabase) {
-      const local = readLocalStats()
-      setLikeCounts(local.likes)
-      setShareCounts(local.shares)
-      setReady(true)
-      return
-    }
-
     let cancelled = false
+    let channel: ReturnType<
+      NonNullable<ReturnType<typeof getSupabase>>['channel']
+    > | null = null
 
-    async function load() {
-      const { data, error } = await supabase!
+    async function boot() {
+      const ok = await initCloudStats()
+      if (cancelled) return
+      setIsGlobal(ok)
+
+      const supabase = getSupabase()
+      if (!supabase || !ok) {
+        const local = readLocalStats()
+        setLikeCounts(local.likes)
+        setShareCounts(local.shares)
+        setReady(true)
+        return
+      }
+
+      const { data, error } = await supabase
         .from('song_stats')
         .select('song_id, likes, shares')
 
       if (cancelled) return
       if (error) {
         console.warn('Could not load song stats:', error.message)
+        setIsGlobal(false)
+        const local = readLocalStats()
+        setLikeCounts(local.likes)
+        setShareCounts(local.shares)
         setReady(true)
         return
       }
+
       const maps = rowsToMaps((data ?? []) as SongStatRow[])
       setLikeCounts(maps.likes)
       setShareCounts(maps.shares)
       setReady(true)
+
+      channel = supabase
+        .channel('song_stats_live')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'song_stats' },
+          (payload) => {
+            const row = asSongStatRow(payload.new ?? payload.old)
+            if (!row) return
+            if (payload.eventType === 'DELETE') {
+              setLikeCounts((p) => {
+                const n = { ...p }
+                delete n[row.song_id]
+                return n
+              })
+              setShareCounts((p) => {
+                const n = { ...p }
+                delete n[row.song_id]
+                return n
+              })
+              return
+            }
+            setLikeCounts((p) => ({ ...p, [row.song_id]: row.likes }))
+            setShareCounts((p) => ({ ...p, [row.song_id]: row.shares }))
+          },
+        )
+        .subscribe()
     }
 
-    void load()
-
-    const channel = supabase
-      .channel('song_stats_live')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'song_stats' },
-        (payload) => {
-          const row = (payload.new ?? payload.old) as SongStatRow | null
-          if (!row?.song_id) return
-          if (payload.eventType === 'DELETE') {
-            setLikeCounts((p) => {
-              const n = { ...p }
-              delete n[row.song_id]
-              return n
-            })
-            setShareCounts((p) => {
-              const n = { ...p }
-              delete n[row.song_id]
-              return n
-            })
-            return
-          }
-          setLikeCounts((p) => ({ ...p, [row.song_id]: Number(row.likes) || 0 }))
-          setShareCounts((p) => ({
-            ...p,
-            [row.song_id]: Number(row.shares) || 0,
-          }))
-        },
-      )
-      .subscribe()
+    void boot()
 
     return () => {
       cancelled = true
-      void supabase.removeChannel(channel)
+      const supabase = getSupabase()
+      if (supabase && channel) void supabase.removeChannel(channel)
     }
   }, [])
 
@@ -161,10 +176,11 @@ export function useSongStats() {
     [shareCounts],
   )
 
-  const applyRow = useCallback((row: SongStatRow | null | undefined) => {
-    if (!row?.song_id) return
-    setLikeCounts((p) => ({ ...p, [row.song_id]: Number(row.likes) || 0 }))
-    setShareCounts((p) => ({ ...p, [row.song_id]: Number(row.shares) || 0 }))
+  const applyRow = useCallback((data: unknown) => {
+    const row = asSongStatRow(data)
+    if (!row) return
+    setLikeCounts((p) => ({ ...p, [row.song_id]: row.likes }))
+    setShareCounts((p) => ({ ...p, [row.song_id]: row.shares }))
   }, [])
 
   const toggleLike = useCallback(
@@ -177,13 +193,14 @@ export function useSongStats() {
       setLikedIds(nextLiked)
       writeLikedIds(nextLiked)
 
+      const cloud = hasCloudStats()
       setLikeCounts((prev) => {
         const current = prev[songId] ?? 0
         const next = {
           ...prev,
           [songId]: wasLiked ? Math.max(0, current - 1) : current + 1,
         }
-        if (!hasCloudStats) {
+        if (!cloud) {
           const stats = readLocalStats()
           stats.likes = next
           writeLocalStats(stats)
@@ -192,7 +209,7 @@ export function useSongStats() {
       })
 
       const supabase = getSupabase()
-      if (!supabase) return
+      if (!supabase || !cloud) return
 
       const { data, error } = await supabase.rpc(
         wasLiked ? 'song_unlike' : 'song_like',
@@ -212,16 +229,17 @@ export function useSongStats() {
         return
       }
 
-      applyRow(data as SongStatRow)
+      applyRow(data)
     },
     [likedIds, applyRow],
   )
 
   const recordShare = useCallback(
     async (songId: string) => {
+      const cloud = hasCloudStats()
       setShareCounts((prev) => {
         const next = { ...prev, [songId]: (prev[songId] ?? 0) + 1 }
-        if (!hasCloudStats) {
+        if (!cloud) {
           const stats = readLocalStats()
           stats.shares = next
           writeLocalStats(stats)
@@ -230,7 +248,7 @@ export function useSongStats() {
       })
 
       const supabase = getSupabase()
-      if (!supabase) return
+      if (!supabase || !cloud) return
 
       const { data, error } = await supabase.rpc('song_share', {
         p_song_id: songId,
@@ -239,7 +257,7 @@ export function useSongStats() {
         console.warn('Share sync failed:', error.message)
         return
       }
-      applyRow(data as SongStatRow)
+      applyRow(data)
     },
     [applyRow],
   )
@@ -251,6 +269,6 @@ export function useSongStats() {
     toggleLike,
     recordShare,
     ready,
-    isGlobal: hasCloudStats,
+    isGlobal,
   }
 }
