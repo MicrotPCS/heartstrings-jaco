@@ -51,13 +51,14 @@ export function Header() {
       <div className="hero">
         <p className="hero-eyebrow">From the porch to the playlist</p>
         <h2 className="hero-title">
-          Stories you can hear.
-          <br />
-          <span>Press play on a track below.</span>
+          To listen, press play on any track below.{' '}
+          <strong className="hero-title-note">
+            (No account or subscription required)
+          </strong>
         </h2>
         <p className="hero-lede">
           Original country songs by Jaco van Zyl — ordered by when they landed
-          on SoundCloud. Tap a cover to listen.
+          on SoundCloud.
         </p>
       </div>
     </header>
