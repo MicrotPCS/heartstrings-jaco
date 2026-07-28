@@ -17,7 +17,7 @@ You **cannot convert** a Web Service into a Static Site in place. Create a **new
 
 | Field | Value |
 |--------|--------|
-| **Name** | `heartstrings-static` (or `heartstrings-country-static`) |
+| **Name** | e.g. `heartstrings-jaco-static` |
 | **Branch** | `main` |
 | **Root Directory** | leave **empty** (repo root) |
 | **Build Command** | `npm ci && npm run build` |
@@ -25,7 +25,7 @@ You **cannot convert** a Web Service into a Static Site in place. Create a **new
 
 5. Click **Create Static Site**
 6. Wait until status is **Live**
-7. Open the free URL (e.g. `https://heartstrings-static.onrender.com`)
+7. Open the free URL (yours is **`https://heartstrings-jaco-static.onrender.com`**)
 8. Confirm: songs play, likes/shares work, page loads **fast** even after waiting a while
 
 ### Optional rewrite (SPA)
@@ -114,11 +114,13 @@ Likes/shares still use Supabase (`public/stats-config.json`) — no change.
 
 ## Troubleshooting
 
-### `https://heartstrings-static.onrender.com` → **404 Not Found** / blank
+### `https://….onrender.com` → **404 Not Found** / blank
 
-That means the URL exists but **no successful deploy published `dist/`**.
+Working static URL for this project: **`https://heartstrings-jaco-static.onrender.com`**
 
-1. Open the service **heartstrings-static** in Render  
+If another hostname 404s, that service never published `dist/` successfully.
+
+1. Open the service **heartstrings-jaco-static** in Render  
 2. Open **Events** (or **Logs**) for the latest deploy  
 3. Check whether the build is **Failed** or **Live** with an empty publish folder  
 
