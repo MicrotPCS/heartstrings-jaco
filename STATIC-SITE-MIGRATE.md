@@ -114,6 +114,40 @@ Likes/shares still use Supabase (`public/stats-config.json`) — no change.
 
 ## Troubleshooting
 
+### `https://heartstrings-static.onrender.com` → **404 Not Found** / blank
+
+That means the URL exists but **no successful deploy published `dist/`**.
+
+1. Open the service **heartstrings-static** in Render  
+2. Open **Events** (or **Logs**) for the latest deploy  
+3. Check whether the build is **Failed** or **Live** with an empty publish folder  
+
+**Most common fixes:**
+
+| Setting | Correct value |
+|---------|----------------|
+| **Root Directory** | **Empty** (blank) — do not put `heartstrings-jaco` or `/` |
+| **Build Command** | `npm ci && npm run build` |
+| **Publish Directory** | `dist` (not `build`, not `./dist/public`, not empty) |
+| **Branch** | `main` |
+
+Then:
+
+1. **Manual Deploy** → **Clear build cache & deploy**  
+2. Wait until the deploy is green / **Live**  
+3. Hard-refresh `https://heartstrings-static.onrender.com`  
+
+In the build log you should see something like:
+
+```text
+✓ built in …
+dist/index.html
+```
+
+If the log shows **error** (TypeScript, npm, etc.), copy that error and fix it — 404 will continue until a deploy succeeds.
+
+### Other issues
+
 | Issue | Fix |
 |--------|-----|
 | Build fails | Check logs; `package-lock.json` must be in repo |
