@@ -170,8 +170,9 @@ main,
   margin: 0;
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(2.4rem, 6vw, 3.75rem);
-  line-height: 1.12;
+  /* Match “The collection” (.section-title) size */
+  font-size: 2rem;
+  line-height: 1.25;
   letter-spacing: -0.01em;
 }
 
