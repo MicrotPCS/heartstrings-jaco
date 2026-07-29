@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "node scripts/generate-sitemap.mjs && tsc -b && vite build",
+    "seo:sitemap": "node scripts/generate-sitemap.mjs",
     "lint": "oxlint",
     "preview": "vite preview",
     "sync:soundcloud": "node scripts/sync-soundcloud.mjs",

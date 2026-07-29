@@ -1,0 +1,9 @@
+# https://heartstrings-country.com
+User-agent: *
+Allow: /
+
+# Do not index local/dev config
+Disallow: /stats-config.json
+Disallow: /stats-config.example.json
+
+Sitemap: https://heartstrings-country.com/sitemap.xml

@@ -6,7 +6,7 @@ export function Header() {
           <img
             className="brand-avatar"
             src="https://i1.sndcdn.com/avatars-wP7yOYLxHptZ9A9N-PUOL5g-t200x200.jpg"
-            alt=""
+            alt="Heartstrings Jaco, country music artist"
             width={44}
             height={44}
           />

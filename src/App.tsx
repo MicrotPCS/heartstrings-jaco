@@ -117,10 +117,16 @@ export default function App() {
       <Header />
 
       <main>
-        <section id="songs" className="songs-section">
+        <section
+          id="songs"
+          className="songs-section"
+          aria-labelledby="collection-heading"
+        >
           <div className="section-head">
             <div>
-              <h2 className="section-title">The collection</h2>
+              <h2 id="collection-heading" className="section-title">
+                The collection
+              </h2>
               <p className="section-lede">
                 Sorted by SoundCloud upload date · continuous play ·{' '}
                 {hasQuery
@@ -230,16 +236,19 @@ export default function App() {
           )}
         </section>
 
-        <section id="about" className="about-section">
-          <h2 className="section-title">About</h2>
+        <section id="about" className="about-section" aria-labelledby="about-heading">
+          <h2 id="about-heading" className="section-title">
+            About Heartstrings Jaco
+          </h2>
           <p>
-            I have a special place in my heart reserved for Country Music,
-            especially in memory of my dad. Then I also discovered the freedom
-            and liberation of reggae music…
+            Heartstrings Jaco is the music of <strong>Jaco van Zyl</strong> —
+            original country and roots songs written with honesty and heart. I
+            have a special place reserved for country music, especially in
+            memory of my dad, and I also found freedom and liberation in reggae.
           </p>
           <p>
-            This site lists every Heartstrings Jaco track in the order it
-            appeared on{' '}
+            This is the official free streaming home for every Heartstrings Jaco
+            track, listed in the order it appeared on{' '}
             <a
               href="https://soundcloud.com/heartstrings-jaco"
               target="_blank"
@@ -247,7 +256,8 @@ export default function App() {
             >
               SoundCloud
             </a>
-            . Tap a cover to play — no account needed.
+            . Tap a cover to play — no account or subscription needed. You can
+            also find the music on Spotify, Apple Music, and Amazon Music.
           </p>
         </section>
       </main>

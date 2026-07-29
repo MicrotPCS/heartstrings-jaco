@@ -1,0 +1,19 @@
+{
+  "name": "Heartstrings Jaco — Country Originals",
+  "short_name": "Heartstrings Jaco",
+  "description": "Original country and roots songs by Jaco van Zyl. Stream free on Heartstrings Country — no account required.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#120e0b",
+  "theme_color": "#b85c38",
+  "lang": "en",
+  "categories": ["music", "entertainment"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -52,7 +52,13 @@ export function SongCard({
               : `Play ${song.title}`
         }
       >
-        <img src={cover} alt="" loading="lazy" />
+        <img
+          src={cover}
+          alt={`Cover art for ${song.title} by Heartstrings Jaco`}
+          loading="lazy"
+          width={500}
+          height={500}
+        />
         {playable ? (
           <span className="play-badge" aria-hidden>
             {isActive && isPlaying ? (
