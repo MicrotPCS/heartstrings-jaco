@@ -11,7 +11,7 @@ export function Header() {
             height={44}
           />
           <div>
-            <p className="brand-kicker">Country · Originals</p>
+            <p className="brand-kicker">Country & Reggae · Originals</p>
             <h1 className="brand-title">Heartstrings Jaco</h1>
           </div>
         </div>
